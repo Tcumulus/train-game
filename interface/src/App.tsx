@@ -3,8 +3,10 @@ import Map from "./components/Map"
 
 const App: React.FC = () => {
   return (
-    <Map />
-  );
+    <div>
+      <Map />
+    </div>
+  )
 }
 
 export default App;
