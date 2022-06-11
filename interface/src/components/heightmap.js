@@ -2,7 +2,7 @@
 // license: MIT
 // rewritten to functional component by Tcumulus
 
-const heightmap = (mapDimension = 16, unitSize = 1, roughness = 8, tile = false) => {
+const heightmap = (mapDimension = 64, unitSize = 1, roughness = 4) => {
   
   // generate empty map with given dimenensions
   let map = Array(mapDimension + 1).fill(0).map(el => new Array(mapDimension + 1).fill(0).map(el => 0));
