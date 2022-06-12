@@ -2,23 +2,23 @@
 // license: MIT
 // rewritten to functional component by Tcumulus
 
-const heightmap = (mapDimension = 64, unitSize = 1, roughness = 4) => {
+const heightmap = (mapDimension: number, unitSize: number, roughness: number): number[][] => {
   
   // generate empty map with given dimenensions
   let map = Array(mapDimension + 1).fill(0).map(el => new Array(mapDimension + 1).fill(0).map(el => 0));
 
   // Random function to offset the center
-  const displace = (amount) => {
+  const displace = (amount: number): number => {
     const max = amount / ( mapDimension * 2 ) * roughness;
     return (Math.random() - 0.5) * max;
   }
 
   // Normalize the value to make sure its within bounds
-  const normalize = (value) => {
+  const normalize = (value: number): number => {
     return Math.max(Math.min(value, 1), 0);
   }
 
-  const midpointDisplacment = (plot) => {
+  const midpointDisplacment = (plot: number) => {
     const subPlot = plot / 2;
 
     if (subPlot > unitSize){

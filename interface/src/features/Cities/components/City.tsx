@@ -1,28 +1,21 @@
-import React from "react"
+import React, { useState } from "react"
+import { getCity } from "./../cities.ts"
 
 interface Props {
-  x_: number,
-  y_: number
+  x: number,
+  y: number
 }
 
-const City: React.FC<Props> = ({ x_, y_ }) => {
-  const image_w = 5000
-  const image_h = 5000
+const City: React.FC<Props> = ({ x, y }) => {
+  const [info, setInfo] = useState<any>(null)
 
-  // convert coords on map to viewport coords
-  function windowCoords(x_: number, y_: number):any {
-    const { innerWidth: width, innerHeight: height } = window;
-    let x = width / image_w * x_
-    let y = width / image_h * y_
-    return { x, y }
+  const onCityClick = () => {
+    const City = getCity(x, y)
+    setInfo(City)
   }
 
-  const { x, y } = windowCoords(x_, y_)
-
   return(
-    <div className="fixed w-2 h-2 bg-red-500">
-
-    </div>
+    <div onClick={onCityClick} className="w-3 h-3 bg-red-700 hover:bg-red-800"></div>
   )
 }
 

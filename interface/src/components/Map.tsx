@@ -1,12 +1,13 @@
 import React, { useState } from "react"
-import heightmap from "./heightmap.js"
-import Cities from "src/features/Cities/Cities"
+import heightmap from "./heightmap.ts"
 import generateCity from "src/features/Cities/components/generateCity.ts"
+import { addCity } from "src/features/Cities/cities.ts"
+import Pixel from "./Pixel"
 
 const dimensions = 64
 
 const Map: React.FC = () => {
-  const generateGridType = () => {
+  const generateGrid = () => {
     const map = heightmap(dimensions, 1, 3.5)
     const rows = []
     for(let i = 0; i < dimensions; i++) {
@@ -22,15 +23,15 @@ const Map: React.FC = () => {
     return rows
   }
 
-  const map = generateGridType()
-  const [grid, setGrid] = useState(map)
+  const map = generateGrid()
+  const [grid, setGrid] = useState<number[][]>(map)
 
   //temporary
   const onClick = () => {
-    const [cityX, cityY] = generateCity(map, dimensions)
-
+    const [x, y] = generateCity(map, dimensions)
+    addCity(x, y)
     let grid_ = map
-    grid_[cityX][cityY] = 3
+    grid_[x][y] = 3
     setGrid(grid_)
   }
 
@@ -40,20 +41,12 @@ const Map: React.FC = () => {
         {grid.map((rows, i) =>
           rows.map((col, k) => (
             <div key={`${i}-${k}`}>            
-              { grid[i][k] === 0 ?
-                <div className="w-3 h-3 bg-blue-700 hover:bg-blue-800" />
-                : grid[i][k] === 1 ?
-                <div className="w-3 h-3 bg-green-700 hover:bg-green-800" />
-                : grid[i][k] === 2 ?
-                <div className="w-3 h-3 bg-slate-700 hover:bg-slate-800" />
-                :
-                <div className="w-3 h-3 bg-red-700 hover:bg-red-800" />
-              }
+              <Pixel x={i} y={k} type={grid[i][k]} />
             </div>
           ))
         )}
       </div>
-      <button onClick={onClick} className="underline ml-10">
+      <button onClick={onClick} className="underline ml-10 h-10">
         Generate
       </button>
     </div>
