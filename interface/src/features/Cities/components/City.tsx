@@ -11,6 +11,7 @@ const City: React.FC<Props> = ({ x, y }) => {
 
   const onCityClick = () => {
     const City = getCity(x, y)
+    console.log(City)
     setInfo(City)
   }
 

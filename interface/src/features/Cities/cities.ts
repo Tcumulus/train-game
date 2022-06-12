@@ -5,6 +5,7 @@ interface City {
   population: number
 }
 
+const names: string[] = ["Piep", "Nytfell", "Helmholm", "Ruttendorf", "Luven", "West town"]
 const cities: City[] = []
 
 export const getCity = (x: number, y: number): City | undefined => {
@@ -19,7 +20,7 @@ export const isCity = (x: number, y: number): boolean => {
 
 export const addCity = (x: number, y: number) => {
   const population = Math.floor(Math.random() * 50) + 50 // between 50 and 100
-  const name = "City"
+  const name = names[Math.floor(Math.random() * names.length)];
   const city = {
     x: x,
     y: y,
