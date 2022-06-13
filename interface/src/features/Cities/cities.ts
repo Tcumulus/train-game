@@ -5,7 +5,7 @@ interface City {
   population: number
 }
 
-const names: string[] = ["Piep", "Nytfell", "Helmholm", "Ruttendorf", "Luven", "West town"]
+const names: string[] = ["Piep", "Nytfell", "Helmholm", "Ruttendorf", "Fürtdorf", "Sanbruck", "Lyston", "Brinton", "Ären", "Ösmå"]
 const cities: City[] = []
 
 export const getCity = (x: number, y: number): City | undefined => {
@@ -16,6 +16,10 @@ export const getCity = (x: number, y: number): City | undefined => {
 export const isCity = (x: number, y: number): boolean => {
   const match = cities.some(city => city.x === x && city.y === y)
   return match
+}
+
+export const getCities = (): City[] => {
+  return cities
 }
 
 export const addCity = (x: number, y: number) => {
