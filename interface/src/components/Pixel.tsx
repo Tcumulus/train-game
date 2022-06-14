@@ -4,7 +4,7 @@ import City from "src/features/Cities/components/City"
 interface Props {
   x: number,
   y: number,
-  type: number
+  type: number,
 }
 
 const Pixel: React.FC<Props> = ({ x, y, type }) => {

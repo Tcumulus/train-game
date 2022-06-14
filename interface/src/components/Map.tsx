@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react"
 import heightmap from "./heightmap.ts"
 import generateCity from "src/features/Cities/components/generateCity.ts"
 import { addCity } from "src/features/Cities/cities.ts"
+import { addLine, endLine } from "src/features/train-lines/lines.ts"
 import Pixel from "./Pixel"
 
 const dimensions = 64
@@ -9,6 +10,7 @@ const dimensions = 64
 const Map: React.FC = () => {
 
   const [grid, setGrid] = useState<number[][]>([[]])
+  const [isDrawing, setIsDrawing] = useState<boolean>(false)
 
   useEffect(() => {
     const map = generateGrid()
@@ -16,7 +18,7 @@ const Map: React.FC = () => {
   }, [])
 
   //temporary
-  const onClick = () => {
+  const onClickNewCity = () => {
     const map = [...grid]
     const [x, y] = generateCity(map, dimensions)
     addCity(x, y)
@@ -24,20 +26,39 @@ const Map: React.FC = () => {
     setGrid(map)
   }
 
+  const onStartDrawing = (x: number, y: number) => {
+    if (isDrawing) {
+      addLine(x, y, grid[x][y])
+    }
+  }
+
+  const onFinishDrawing = () => {
+    if (isDrawing) {
+      endLine()
+    }
+    setIsDrawing(false)
+  }
+
   return(
     <div className="flex">
       <div className={`grid grid-rows-64 grid-flow-col overflow-auto`}>
         {grid.map((rows, i) =>
           rows.map((col, k) => (
-            <div key={`${i}-${k}`}>            
-              <Pixel x={i} y={k} type={grid[i][k]} />
+            <div onClick={() => onStartDrawing(i, k)} key={`${i}-${k}`}>            
+              <Pixel x={i} y={k} type={grid[i][k]}/>
             </div>
           ))
         )}
       </div>
-      <button onClick={onClick} className="underline ml-10 h-10">
+      <button onClick={onClickNewCity} className="underline ml-10 h-10">
         Add city
       </button>
+      {
+        isDrawing ?
+        <button onClick={onFinishDrawing} className="underline ml-10 h-10">Finish</button>
+        :
+        <button onClick={() => setIsDrawing(true)} className="underline ml-10 h-10">Draw</button>
+      }
     </div>
   )
 }
