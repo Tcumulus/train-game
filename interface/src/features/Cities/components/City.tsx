@@ -3,16 +3,19 @@ import { getCity } from "./../cities.ts"
 
 interface Props {
   x: number,
-  y: number
+  y: number,
+  isDrawing: boolean
 }
 
-const City: React.FC<Props> = ({ x, y }) => {
+const City: React.FC<Props> = ({ x, y, isDrawing }) => {
   const [info, setInfo] = useState<any>(null)
 
   const onCityClick = () => {
-    const City = getCity(x, y)
-    console.log(City)
-    setInfo(City)
+    if (!isDrawing) {
+      const City = getCity(x, y)
+      console.log(City)
+      setInfo(City)
+    }
   }
 
   return(

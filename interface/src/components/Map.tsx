@@ -45,7 +45,7 @@ const Map: React.FC = () => {
         {grid.map((rows, i) =>
           rows.map((col, k) => (
             <div onClick={() => onStartDrawing(i, k)} key={`${i}-${k}`}>            
-              <Pixel x={i} y={k} type={grid[i][k]}/>
+              <Pixel x={i} y={k} type={grid[i][k]} isDrawing={isDrawing}/>
             </div>
           ))
         )}

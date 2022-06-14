@@ -17,8 +17,8 @@ let distance = 0
 let [x1, y1] = [0, 0]
 
 export const addLine = (x: number, y: number, type: number) => {
-  if (counter === 0) { // start of line
-    if (type === 1) { //! TB CHANGED
+  if (counter === 0) {
+    if (type === 3) {
       counter++
     }
   } else {
@@ -34,18 +34,20 @@ export const addLine = (x: number, y: number, type: number) => {
 
 export const endLine = () => {
   // check if end of line is city
-  const line = {
-    x1: segments[0].x1,
-    y1: segments[0].y1,
-    x2: x1,
-    y2: y1,
-    segments: segments,
-    distance: distance
+  if (segments.length > 0) {
+    const line = {
+      x1: segments[0].x1,
+      y1: segments[0].y1,
+      x2: x1,
+      y2: y1,
+      segments: segments,
+      distance: distance
+    }
+    lines.push(line)
+    segments = []
+    distance = 0
+    counter = 0
+  
+    console.log(line)
   }
-  lines.push(line)
-  segments = []
-  distance = 0
-  counter = 0
-
-  console.log(line)
 }

@@ -5,14 +5,15 @@ interface Props {
   x: number,
   y: number,
   type: number,
+  isDrawing: boolean
 }
 
-const Pixel: React.FC<Props> = ({ x, y, type }) => {
+const Pixel: React.FC<Props> = ({ x, y, type, isDrawing }) => {
   return (
     <>
       {
         type === 3 ?
-        <City x={x} y={y}/>
+        <City x={x} y={y} isDrawing={isDrawing}/>
         : type === 0 ?
         <div className="w-3 h-3 bg-blue-700 hover:bg-blue-800" />
         : type === 1 ?
