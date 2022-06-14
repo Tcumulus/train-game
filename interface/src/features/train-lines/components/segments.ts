@@ -1,5 +1,3 @@
-// code inspired by https://www.redblobgames.com/grids/line-drawing.html
-
 interface Segment {
   x1: number,
   y1: number,

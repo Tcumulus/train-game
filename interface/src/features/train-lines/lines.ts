@@ -15,26 +15,27 @@ let counter = 0
 let segments: any[] = []
 let distance = 0
 let [x1, y1] = [0, 0]
+let lastType = 0
 
 export const addLine = (x: number, y: number, type: number) => {
   if (counter === 0) {
-    if (type === 3) {
-      counter++
+    if (type !== 3) {
+      return false
     }
   } else {
     if (x1 !== x || y1 !== y) {
       const segment = addSegment(x1, y1, x, y)
-      distance += segment.distance
       segments.push(segment)
-      counter++
+      distance += segment.distance
     }
   }
   [x1, y1] = [x, y]
+  lastType = type
+  counter++
 }
 
 export const endLine = () => {
-  // check if end of line is city
-  if (segments.length > 0) {
+  if (segments.length > 0 && lastType === 3) {
     const line = {
       x1: segments[0].x1,
       y1: segments[0].y1,
