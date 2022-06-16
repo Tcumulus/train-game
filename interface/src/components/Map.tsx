@@ -8,7 +8,6 @@ import Pixel from "./Pixel"
 const dimensions = 64
 
 const Map: React.FC = () => {
-
   const [grid, setGrid] = useState<number[][]>([[]])
   const [isDrawing, setIsDrawing] = useState<boolean>(false)
 
@@ -34,7 +33,12 @@ const Map: React.FC = () => {
 
   const onFinishDrawing = () => {
     if (isDrawing) {
-      endLine()
+      let map = [...grid]
+      const points = endLine()
+      for(let i = 0; i < points.length; i++) {
+        map[points[i][0]][points[i][1]] = 4
+      }
+      setGrid(map)
     }
     setIsDrawing(false)
   }

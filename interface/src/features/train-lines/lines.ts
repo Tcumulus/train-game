@@ -12,10 +12,12 @@ interface Line {
 const lines: Line[] = []
 
 let counter = 0
+let points: number[][] = []
 let segments: any[] = []
 let distance = 0
 let [x1, y1] = [0, 0]
 let lastType = 0
+
 
 export const addLine = (x: number, y: number, type: number) => {
   if (counter === 0) {
@@ -27,6 +29,9 @@ export const addLine = (x: number, y: number, type: number) => {
       const segment = addSegment(x1, y1, x, y)
       segments.push(segment)
       distance += segment.distance
+      for(let i = 0; i < segment.points.length; i++) {
+        points.push(segment.points[i])
+      }
     }
   }
   [x1, y1] = [x, y]
@@ -34,7 +39,7 @@ export const addLine = (x: number, y: number, type: number) => {
   counter++
 }
 
-export const endLine = () => {
+export const endLine = (): number[][] | false => {
   if (segments.length > 0 && lastType === 3) {
     const line = {
       x1: segments[0].x1,
@@ -49,6 +54,8 @@ export const endLine = () => {
     distance = 0
     counter = 0
   
-    console.log(line)
+    points.pop()
+    return points
   }
+  return false
 }

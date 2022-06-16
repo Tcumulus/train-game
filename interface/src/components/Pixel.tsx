@@ -18,8 +18,10 @@ const Pixel: React.FC<Props> = ({ x, y, type, isDrawing }) => {
         <div className="w-3 h-3 bg-blue-700 hover:bg-blue-800" />
         : type === 1 ?
         <div className="w-3 h-3 bg-green-700 hover:bg-green-800" />
-        :
+        : type == 2 ?
         <div className="w-3 h-3 bg-slate-700 hover:bg-slate-800" />
+        :
+        <div className="w-3 h-3 bg-yellow-700 hover:bg-yellow-800" />
       }
     </>
   )

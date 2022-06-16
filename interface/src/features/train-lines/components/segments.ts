@@ -7,7 +7,7 @@ interface Segment {
   distance: number
 }
 
-const segments: Segment[] = [] 
+const segments: Segment[] = []
 
 export const addSegment = (x1: number, y1: number, x2: number, y2: number): Segment => {
   const [dx, dy] = [x2 - x1, y2 - y1]
