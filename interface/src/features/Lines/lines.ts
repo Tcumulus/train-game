@@ -52,9 +52,9 @@ export const endLine = (): number[][] | false => {
       distance: distance
     }
     lines.push(line)
-    console.log(points)
     counter = 0
     return points
   }
+  counter = 0
   return false
 }
