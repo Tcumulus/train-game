@@ -19,7 +19,6 @@ export const addSegment = (x1: number, y1: number, x2: number, y2: number): Segm
     const y = Math.round(lerp(y1, y2, t))
     points.push([x, y])
   }
-  points.shift() //remove first element (city itself)
   
   const segment = {
     x1: x1,

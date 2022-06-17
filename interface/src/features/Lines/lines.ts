@@ -18,9 +18,11 @@ let distance = 0
 let [x1, y1] = [0, 0]
 let lastType = 0
 
-
 export const addLine = (x: number, y: number, type: number) => {
   if (counter === 0) {
+    points = []
+    segments = []
+    distance = 0
     if (type !== 3) {
       return false
     }
@@ -50,11 +52,8 @@ export const endLine = (): number[][] | false => {
       distance: distance
     }
     lines.push(line)
-    segments = []
-    distance = 0
+    console.log(points)
     counter = 0
-  
-    points.pop()
     return points
   }
   return false

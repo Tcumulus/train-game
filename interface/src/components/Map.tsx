@@ -35,7 +35,7 @@ const Map: React.FC = () => {
     if (isDrawing) {
       let map = [...grid]
       const points = endLine()
-      for(let i = 0; i < points.length; i++) {
+      for(let i = 1; i < points.length-1; i++) { //loop through points, but don't count [0] and [points.length]
         map[points[i][0]][points[i][1]] = 4
       }
       setGrid(map)
