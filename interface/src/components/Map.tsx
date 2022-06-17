@@ -2,10 +2,10 @@ import React, { useState, useEffect } from "react"
 import heightmap from "./heightmap.ts"
 import generateCity from "src/features/Cities/components/generateCity.ts"
 import { addCity } from "src/features/Cities/cities.ts"
-import { addLine, endLine } from "src/features/train-lines/lines.ts"
+import { addLine, endLine } from "src/features/Lines/lines.ts"
 import Pixel from "./Pixel"
 
-const dimensions = 64
+const dimensions = 128
 
 const Map: React.FC = () => {
   const [grid, setGrid] = useState<number[][]>([[]])
@@ -45,7 +45,7 @@ const Map: React.FC = () => {
 
   return(
     <div className="flex">
-      <div className={`grid grid-rows-64 grid-flow-col overflow-auto`}>
+      <div className={`grid grid-rows-128 grid-flow-col overflow-auto`}>
         {grid.map((rows, i) =>
           rows.map((col, k) => (
             <div onClick={() => onStartDrawing(i, k)} key={`${i}-${k}`}>            
