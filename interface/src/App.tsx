@@ -1,10 +1,11 @@
-import React from "react"
+import React, { useState } from "react"
 import Map from "./components/Map"
 
 const App: React.FC = () => {
+  const [balance, setBalance] = useState(200)
   return (
     <div>
-      <Map />
+      <Map balance={balance} setBalance={setBalance}/>
     </div>
   )
 }

@@ -7,7 +7,12 @@ import Pixel from "./Pixel"
 
 const dimensions = 64
 
-const Map: React.FC = () => {
+interface Props {
+  balance: number,
+  setBalance: Function
+}
+
+const Map: React.FC<Props> = ({ balance, setBalance }) => {
   const [grid, setGrid] = useState<number[][]>([[]])
   const [isDrawing, setIsDrawing] = useState<boolean>(false)
 
@@ -33,8 +38,12 @@ const Map: React.FC = () => {
 
   const onFinishDrawing = () => {
     if (isDrawing) {
-      let map = [...grid]
       const points = endLine()
+      const price = calculateLinePrice(grid, points)
+      console.log(price)
+      setBalance((balance: number) => balance - price)
+
+      let map = [...grid]
       for(let i = 1; i < points.length-1; i++) { //loop through points, but don't count [0] and [points.length]
         map[points[i][0]][points[i][1]] = 4
       }
@@ -66,8 +75,9 @@ const Map: React.FC = () => {
     </div>
   )
 }
+export default Map
 
-const generateGrid = () => {
+const generateGrid = (): number[][] => {
   const map = heightmap(dimensions, 1, 3.5)
   const rows = []
   for(let i = 0; i < dimensions; i++) {
@@ -83,4 +93,13 @@ const generateGrid = () => {
   return rows
 }
 
-export default Map
+const calculateLinePrice = (grid: number[][], points: number[][]): number => {
+  let price = 0
+  for(let i = 0; i < points.length; i++) {
+    const type = grid[points[i][0]][points[i][1]]
+    if (type === 0) { price += 10 }
+    else if (type === 1) { price += 2 }
+    else if (type === 2) { price += 6 }
+  }
+  return price
+}
