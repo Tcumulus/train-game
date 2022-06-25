@@ -40,14 +40,18 @@ const Map: React.FC<Props> = ({ balance, setBalance }) => {
     if (isDrawing) {
       const points = endLine()
       const price = calculateLinePrice(grid, points)
-      console.log(price)
-      setBalance((balance: number) => balance - price)
-
-      let map = [...grid]
-      for(let i = 1; i < points.length-1; i++) { //loop through points, but don't count [0] and [points.length]
-        map[points[i][0]][points[i][1]] = 4
+      if (price) {
+        console.log("price: ", price)
+        setBalance((balance: number) => balance - price)
+  
+        let map = [...grid]
+        for(let i = 0; i < points.length; i++) {
+          if (map[points[i][0]][points[i][1]] !== 3) {
+            map[points[i][0]][points[i][1]] = 4
+          }
+        }
+        setGrid(map)
       }
-      setGrid(map)
     }
     setIsDrawing(false)
   }
@@ -93,13 +97,16 @@ const generateGrid = (): number[][] => {
   return rows
 }
 
-const calculateLinePrice = (grid: number[][], points: number[][]): number => {
+const calculateLinePrice = (grid: number[][], points: number[][]): number | false => {
   let price = 0
+  console.log(points)
   for(let i = 0; i < points.length; i++) {
     const type = grid[points[i][0]][points[i][1]]
+    console.log(type)
     if (type === 0) { price += 10 }
     else if (type === 1) { price += 2 }
     else if (type === 2) { price += 6 }
+    else if (type === 3) { price += 15 }
   }
   return price
 }

@@ -1,36 +1,42 @@
 interface Segment {
+  x0: number,
+  y0: number,
   x1: number,
   y1: number,
-  x2: number,
-  y2: number,
   points: number[][],
   distance: number
 }
 
-export const addSegment = (x1: number, y1: number, x2: number, y2: number): Segment => {
+export const addSegment = (x0: number, y0: number, x1: number, y1: number): Segment => {
   const points: number[][] = []
-  const [dx, dy] = [x2 - x1, y2 - y1]
-  const distance = Math.sqrt(dx**2 + dy**2)
+  const [dx, dy] = [Math.abs(x1 - x0), -Math.abs(y1 - y0)]
+  const [sx, sy] = [x0 < x1 ? 1 : -1, y0 < y1 ? 1 : -1]
+  let error = dx + dy
 
-  //calculate points between two points
-  for (let i = 0; i <= distance; i++) {
-    let t = distance === 0 ? 0.0 : i / distance
-    const x = Math.round(lerp(x1, x2, t))
-    const y = Math.round(lerp(y1, y2, t))
-    points.push([x, y])
+  while (true) {
+    points.push([x0, y0])
+    if (x0 === x1 && y0 === y1) { break }
+    const e2 = 2 * error
+    if (e2 >= dy) {
+      if (x0 == x1) { break }
+      error = error + dy
+      x0 = x0 + sx
+    }
+    if (e2 <= dx) {
+      if (y0 == y1) { break }
+      error = error + dx
+      y0 = y0 + sy
+    }
   }
   
+  const distance = Math.sqrt(dx**2 + dy**2)
   const segment = {
+    x0: x0,
+    y0: y0,
     x1: x1,
     y1: y1,
-    x2: x2,
-    y2: y2,
     points: points,
     distance: distance
   }
   return segment
-}
-
-const lerp = (start: number, end: number, t: number): number => {
-  return start + t * (end-start);
 }

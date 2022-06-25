@@ -1,10 +1,10 @@
 import { addSegment } from "./components/segments.ts"
 
 interface Line {
+  x0: number,
+  y0: number,
   x1: number,
   y1: number,
-  x2: number,
-  y2: number,
   segments: any[],
   distance: number
 }
@@ -15,7 +15,7 @@ let counter = 0
 let points: number[][] = []
 let segments: any[] = []
 let distance = 0
-let [x1, y1] = [0, 0]
+let [x0, y0] = [0, 0]
 let lastType = 0
 
 export const addLine = (x: number, y: number, type: number) => {
@@ -27,8 +27,8 @@ export const addLine = (x: number, y: number, type: number) => {
       return false
     }
   } else {
-    if (x1 !== x || y1 !== y) {
-      const segment = addSegment(x1, y1, x, y)
+    if (x0 !== x || y0 !== y) {
+      const segment = addSegment(x0, y0, x, y)
       segments.push(segment)
       distance += segment.distance
       for(let i = 0; i < segment.points.length; i++) {
@@ -36,7 +36,7 @@ export const addLine = (x: number, y: number, type: number) => {
       }
     }
   }
-  [x1, y1] = [x, y]
+  [x0, y0] = [x, y]
   lastType = type
   counter++
 }
@@ -44,10 +44,10 @@ export const addLine = (x: number, y: number, type: number) => {
 export const endLine = (): number[][] | false => {
   if (segments.length > 0 && lastType === 3) {
     const line = {
-      x1: segments[0].x1,
-      y1: segments[0].y1,
-      x2: x1,
-      y2: y1,
+      x0: segments[0].x0,
+      y0: segments[0].y0,
+      x1: x0,
+      y1: y0,
       segments: segments,
       distance: distance
     }
