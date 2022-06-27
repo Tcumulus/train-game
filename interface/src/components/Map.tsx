@@ -14,11 +14,13 @@ interface Props {
 
 const Map: React.FC<Props> = ({ balance, setBalance }) => {
   const [grid, setGrid] = useState<number[][]>([[]])
+  const [drawingGrid, setDrawingGrid] = useState<number[][]>([[]])
   const [isDrawing, setIsDrawing] = useState<boolean>(false)
 
   useEffect(() => {
     const map = generateGrid()
     setGrid(map)
+    setDrawingGrid(map)
   }, [])
 
   //temporary
@@ -28,29 +30,31 @@ const Map: React.FC<Props> = ({ balance, setBalance }) => {
     addCity(x, y)
     map[x][y] = 3
     setGrid(map)
+    setDrawingGrid(map)
   }
 
   const onStartDrawing = (x: number, y: number) => {
     if (isDrawing) {
-      addLine(x, y, grid[x][y])
+      const points = addLine(x, y, drawingGrid[x][y])
+      if (points) {
+        const map = updatePoints(points, drawingGrid)
+        setDrawingGrid(map)
+      }
     }
   }
 
   const onFinishDrawing = () => {
     if (isDrawing) {
       const points = endLine()
-      const price = calculateLinePrice(grid, points)
-      if (price) {
+      if (points) {
+        const price = calculateLinePrice(grid, points)
         console.log("price: ", price)
         setBalance((balance: number) => balance - price)
-  
-        let map = [...grid]
-        for(let i = 0; i < points.length; i++) {
-          if (map[points[i][0]][points[i][1]] !== 3) {
-            map[points[i][0]][points[i][1]] = 4
-          }
-        }
+        const map = updatePoints(points, drawingGrid)
         setGrid(map)
+      } else {
+        console.log(grid[0][0])
+        setDrawingGrid(grid)
       }
     }
     setIsDrawing(false)
@@ -58,14 +62,29 @@ const Map: React.FC<Props> = ({ balance, setBalance }) => {
 
   return(
     <div className="flex">
-      <div className={`grid grid-rows-64 grid-flow-col overflow-auto`}>
-        {grid.map((rows, i) =>
-          rows.map((col, k) => (
-            <div onClick={() => onStartDrawing(i, k)} key={`${i}-${k}`}>            
-              <Pixel x={i} y={k} type={grid[i][k]} isDrawing={isDrawing}/>
-            </div>
-          ))
-        )}
+      <div className="grid grid-rows-64 grid-flow-col overflow-auto">
+        { isDrawing ? 
+          <>
+            { drawingGrid.map((rows, i) =>
+              rows.map((col, k) => (
+                <div onClick={() => onStartDrawing(i, k)} key={`${i}-${k}`}>
+                  <Pixel x={i} y={k} type={drawingGrid[i][k]} isDrawing={isDrawing}/>
+                </div>
+              ))
+            )}
+          </>
+          :
+          <>
+            { grid.map((rows, i) =>
+              rows.map((col, k) => (
+                <div onClick={() => onStartDrawing(i, k)} key={`${i}-${k}`}>            
+                  <Pixel x={i} y={k} type={grid[i][k]} isDrawing={isDrawing}/>
+                </div>
+              ))
+            )}
+          </>
+        }
+
       </div>
       <button onClick={onClickNewCity} className="underline ml-10 h-10">
         Add city
@@ -97,16 +116,27 @@ const generateGrid = (): number[][] => {
   return rows
 }
 
-const calculateLinePrice = (grid: number[][], points: number[][]): number | false => {
+const calculateLinePrice = (grid: number[][], points: number[][]): number => {
   let price = 0
-  console.log(points)
   for(let i = 0; i < points.length; i++) {
     const type = grid[points[i][0]][points[i][1]]
-    console.log(type)
+    
     if (type === 0) { price += 10 }
     else if (type === 1) { price += 2 }
     else if (type === 2) { price += 6 }
     else if (type === 3) { price += 15 }
   }
   return price
+}
+
+const updatePoints = (points: number[][], grid: number[][]): number[][] => {
+  const map = grid.map(item => item.slice())
+  for(let i = 0; i < points.length; i++) {
+    if (map[points[i][0]][points[i][1]] !== 3) {
+      console.log(grid[points[i][0]][points[i][1]])
+      map[points[i][0]][points[i][1]] = 4
+      console.log(grid[points[i][0]][points[i][1]])
+    }
+  }
+  return map
 }
