@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react"
 import heightmap from "./heightmap.ts"
 import generateCity from "src/features/Cities/components/generateCity.ts"
-import { addCity } from "src/features/Cities/cities.ts"
 import { addLine, endLine } from "src/features/Lines/lines.ts"
 import Pixel from "./Pixel"
 
@@ -12,33 +11,35 @@ interface Props {
   setBalance: Function
 }
 
+interface Gridcell {
+  type: number,
+  line: boolean,
+  drawLine: boolean,
+  track: { type: number, direction: number, rotation: number }
+}
+
 const Map: React.FC<Props> = ({ balance, setBalance }) => {
-  const [grid, setGrid] = useState<number[][]>([[]])
-  const [drawingGrid, setDrawingGrid] = useState<number[][]>([[]])
+  const [grid, setGrid] = useState<Gridcell[][]>([[]])
   const [isDrawing, setIsDrawing] = useState<boolean>(false)
 
   useEffect(() => {
     const map = generateGrid()
     setGrid(map)
-    setDrawingGrid(map)
   }, [])
 
-  //temporary
   const onClickNewCity = () => {
     const map = [...grid]
     const [x, y] = generateCity(map, dimensions)
-    addCity(x, y)
-    map[x][y] = 3
+    map[x][y].type = 3
     setGrid(map)
-    setDrawingGrid(map)
   }
 
   const onStartDrawing = (x: number, y: number) => {
     if (isDrawing) {
-      const points = addLine(x, y, drawingGrid[x][y])
+      const points = addLine(x, y, grid[x][y].type)
       if (points) {
-        const map = updatePoints(points, drawingGrid)
-        setDrawingGrid(map)
+        const map = updatePoints(points, grid, true)
+        setGrid(map)
       }
     }
   }
@@ -48,14 +49,11 @@ const Map: React.FC<Props> = ({ balance, setBalance }) => {
       const points = endLine()
       if (points) {
         const price = calculateLinePrice(grid, points)
-        console.log("price: ", price)
         setBalance((balance: number) => balance - price)
-        const map = updatePoints(points, drawingGrid)
+        const map = updatePoints(points, grid, false)
         setGrid(map)
-      } else {
-        console.log(grid[0][0])
-        setDrawingGrid(grid)
       }
+      grid.map(column => column.map(item => item.drawLine = false))
     }
     setIsDrawing(false)
   }
@@ -63,28 +61,13 @@ const Map: React.FC<Props> = ({ balance, setBalance }) => {
   return(
     <div className="flex">
       <div className="grid grid-rows-64 grid-flow-col overflow-auto">
-        { isDrawing ? 
-          <>
-            { drawingGrid.map((rows, i) =>
-              rows.map((col, k) => (
-                <div onClick={() => onStartDrawing(i, k)} key={`${i}-${k}`}>
-                  <Pixel x={i} y={k} type={drawingGrid[i][k]} isDrawing={isDrawing}/>
-                </div>
-              ))
-            )}
-          </>
-          :
-          <>
-            { grid.map((rows, i) =>
-              rows.map((col, k) => (
-                <div onClick={() => onStartDrawing(i, k)} key={`${i}-${k}`}>            
-                  <Pixel x={i} y={k} type={grid[i][k]} isDrawing={isDrawing}/>
-                </div>
-              ))
-            )}
-          </>
-        }
-
+        { grid.map((rows, i) =>
+          rows.map((col, k) => (
+            <div onClick={() => onStartDrawing(i, k)} key={`${i}-${k}`}>
+              <Pixel x={i} y={k} gridcell={grid[i][k]} isDrawing={isDrawing}/>
+            </div>
+          ))
+        )}
       </div>
       <button onClick={onClickNewCity} className="underline ml-10 h-10">
         Add city
@@ -95,32 +78,54 @@ const Map: React.FC<Props> = ({ balance, setBalance }) => {
         :
         <button onClick={() => setIsDrawing(true)} className="underline ml-10 h-10">Draw</button>
       }
+      <p className="ml-10 mt-2">
+        {"€" + balance}
+      </p>
     </div>
   )
 }
 export default Map
 
-const generateGrid = (): number[][] => {
+const initiateGridcell = (): Gridcell => {
+  const gridcell = { 
+    type: 0, 
+    line: false, 
+    drawLine: false, 
+    track: { type: 0, direction: 0, rotation: 0 } 
+  }
+  return gridcell
+}
+
+const generateGrid = (): Gridcell[][] => {
   const map = heightmap(dimensions, 1, 3.5)
   const rows = []
   for(let i = 0; i < dimensions; i++) {
     const column = []
     for(let j = 0; j < dimensions; j++) {
+      let element = initiateGridcell()
       const cell = map[i][j]
-      if (cell < 0.2) { column.push(0) }
-      else if (cell >= 0.2 && cell < 0.85) { column.push(1) }
-      else { column.push(2) }
+      if (cell < 0.2) {
+        element.type = 0
+        column.push(element)
+      }
+      else if (cell >= 0.2 && cell < 0.85) {
+        element.type = 1
+        column.push(element) 
+      }
+      else {
+        element.type = 2
+        column.push(element) 
+      }
     }
     rows.push(column)
   }
   return rows
 }
 
-const calculateLinePrice = (grid: number[][], points: number[][]): number => {
+const calculateLinePrice = (grid: Gridcell[][], points: number[][]): number => {
   let price = 0
   for(let i = 0; i < points.length; i++) {
-    const type = grid[points[i][0]][points[i][1]]
-    
+    const type = grid[points[i][0]][points[i][1]].type
     if (type === 0) { price += 10 }
     else if (type === 1) { price += 2 }
     else if (type === 2) { price += 6 }
@@ -129,13 +134,18 @@ const calculateLinePrice = (grid: number[][], points: number[][]): number => {
   return price
 }
 
-const updatePoints = (points: number[][], grid: number[][]): number[][] => {
-  const map = grid.map(item => item.slice())
+const updatePoints = (points: number[][], grid: Gridcell[][], temp: boolean): Gridcell[][] => {
+  const map = [...grid]
   for(let i = 0; i < points.length; i++) {
-    if (map[points[i][0]][points[i][1]] !== 3) {
-      console.log(grid[points[i][0]][points[i][1]])
-      map[points[i][0]][points[i][1]] = 4
-      console.log(grid[points[i][0]][points[i][1]])
+    const x = points[i][0]
+    const y = points[i][1]
+    if (map[x][y].type !== 3) {
+      if (temp) {
+        map[x][y].drawLine = true
+      } else {
+        map[x][y].line = true
+      }
+      
     }
   }
   return map

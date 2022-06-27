@@ -1,6 +1,6 @@
-import { isCity, getCities } from "../cities.ts"
+import { isCity, getCities, addCity } from "../cities.ts"
 
-const generateCity = (grid: number[][], dimensions: number): [number, number] => {
+const generateCity = (grid: any[][], dimensions: number): [number, number] => {
   const cities = getCities()
   let [x, y] = [0, 0]
 
@@ -17,19 +17,22 @@ const generateCity = (grid: number[][], dimensions: number): [number, number] =>
     }
   }
 
-  if (grid[x][y] === 1) {
+  if (grid[x][y].type === 1) {
     //check that there is no city in the 5x5 grid surrounding it
     for(let i = 0; i < 5; i++) {
       for(let j = 0; j < 5; j++) {
         if (isCity(x+i-2, y+j-2)) {
           [x, y] = generateCity(grid, dimensions)
+          addCity(x, y)
           return [x, y]
         }
       }
     }
+    addCity(x, y)
     return [x, y]
   } else {
     [x, y] = generateCity(grid, dimensions)
+    addCity(x, y)
     return [x, y]
   }
 }
