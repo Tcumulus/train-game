@@ -1,6 +1,5 @@
 export const generateTrack = (points: number[][], grid: any[][]): any[][] => {
   const map = [...grid]
-  console.log(points)
   for (let i = 1; i < points.length-1; i++) {
     const [point, point0, point1] = [points[i], points[i-1], points[i+1]]
     const [x0, x1, x2] = [point0[0], point[0], point1[0]]

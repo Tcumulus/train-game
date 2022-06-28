@@ -11,7 +11,6 @@ interface Props {
 }
 
 const Track: React.FC<Props> = ({ track }) => {
-  console.log(track)
   return (
     <>
     {
