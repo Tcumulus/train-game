@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react"
-import heightmap from "./heightmap.ts"
-import generateCity from "src/features/Cities/components/generateCity.ts"
-import { addLine, endLine } from "src/features/Lines/lines.ts"
+import heightmap from "./heightmap"
+import generateCity from "src/features/Cities/components/generateCity"
+import { addLine, endLine } from "src/features/Lines/lines"
+import { generateTrack } from "src/features/Lines/components/tracks"
 import Pixel from "./Pixel"
 
 const dimensions = 64
@@ -15,7 +16,7 @@ interface Gridcell {
   type: number,
   line: boolean,
   drawLine: boolean,
-  track: { type: number, direction: number, rotation: number }
+  track: { type: number, rotation: number }
 }
 
 const Map: React.FC<Props> = ({ balance, setBalance }) => {
@@ -50,7 +51,9 @@ const Map: React.FC<Props> = ({ balance, setBalance }) => {
       if (points) {
         const price = calculateLinePrice(grid, points)
         setBalance((balance: number) => balance - price)
-        const map = updatePoints(points, grid, false)
+
+        let map = updatePoints(points, grid, false)
+        map = generateTrack(points, map)
         setGrid(map)
       }
       grid.map(column => column.map(item => item.drawLine = false))
@@ -91,7 +94,7 @@ const initiateGridcell = (): Gridcell => {
     type: 0, 
     line: false, 
     drawLine: false, 
-    track: { type: 0, direction: 0, rotation: 0 } 
+    track: { type: 0, rotation: 0 } 
   }
   return gridcell
 }
@@ -145,7 +148,6 @@ const updatePoints = (points: number[][], grid: Gridcell[][], temp: boolean): Gr
       } else {
         map[x][y].line = true
       }
-      
     }
   }
   return map

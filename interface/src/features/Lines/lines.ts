@@ -18,7 +18,7 @@ let distance = 0
 let [x0, y0] = [0, 0]
 let lastType = 0
 
-export const addLine = (x: number, y: number, type: number): number[][] | boolean => {
+export const addLine = (x: number, y: number, type: number): number[][] | false => {
   if (counter === 0) {
     points = []
     segments = []
@@ -32,7 +32,9 @@ export const addLine = (x: number, y: number, type: number): number[][] | boolea
       segments.push(segment)
       distance += segment.distance
       for(let i = 0; i < segment.points.length; i++) {
-        points.push(segment.points[i])
+        if (i !== 0 || points.length === 0) {
+          points.push(segment.points[i])
+        }
       }
     }
   }

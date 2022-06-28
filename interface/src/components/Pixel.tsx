@@ -1,5 +1,7 @@
 import React from "react"
 import City from "src/features/Cities/components/City"
+import Track from "src/features/Lines/components/Track"
+
 
 interface Props {
   x: number,
@@ -9,6 +11,17 @@ interface Props {
 }
 
 const Pixel: React.FC<Props> = ({ x, y, gridcell, isDrawing }) => {
+  const getColor = (): string => {
+    let color = ""
+    if (gridcell.type === 0) {
+      color = "bg-blue-700 hover:bg-blue-800"
+    } else if (gridcell.type === 1) {
+      color = "bg-green-700 hover:bg-green-800"
+    } else if (gridcell.type === 2) {
+      color = "bg-slate-700 hover:bg-slate-800"
+    }
+    return color
+  }
   return (
     <>
       {
@@ -17,20 +30,16 @@ const Pixel: React.FC<Props> = ({ x, y, gridcell, isDrawing }) => {
         :
         <>
           {
-            gridcell.line === true ? //temporary
-            <div className="w-3 h-3 bg-yellow-400 hover:bg-yellow-500" />
-            : gridcell.type === 3 ?
+            gridcell.type === 3 ?
             <City x={x} y={y} isDrawing={isDrawing}/>
-            : gridcell.type === 0 ?
-            <div className="w-3 h-3 bg-blue-700 hover:bg-blue-800" />
-            : gridcell.type === 1 ?
-            <div className="w-3 h-3 bg-green-700 hover:bg-green-800" />
-            : gridcell.type === 2 ?
-            <div className="w-3 h-3 bg-slate-700 hover:bg-slate-800" />
-            : null
-          }
-          {
-            //TRACK
+            :
+              <div className={`w-3 h-3 ${getColor()}`}>
+                {
+                  gridcell.line ?
+                  <Track track={gridcell.track}/>
+                  : null
+                }
+              </div>
           }
         </>
       }
