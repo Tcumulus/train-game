@@ -22,6 +22,7 @@ interface Gridcell {
 const Map: React.FC<Props> = ({ balance, setBalance }) => {
   const [grid, setGrid] = useState<Gridcell[][]>([[]])
   const [isDrawing, setIsDrawing] = useState<boolean>(false)
+  const [validDraw, setValidDraw] = useState<boolean>(false)
 
   useEffect(() => {
     const map = generateGrid()
@@ -41,6 +42,10 @@ const Map: React.FC<Props> = ({ balance, setBalance }) => {
       if (points) {
         const map = updatePoints(points, grid, true)
         setGrid(map)
+        if (points.length > 1) {
+          if (grid[x][y].type === 3) { setValidDraw(true) }
+          else { setValidDraw(false) }
+        }
       }
     }
   }
@@ -59,6 +64,7 @@ const Map: React.FC<Props> = ({ balance, setBalance }) => {
       grid.map(column => column.map(item => item.drawLine = false))
     }
     setIsDrawing(false)
+    setValidDraw(false)
   }
 
   return(
@@ -77,7 +83,14 @@ const Map: React.FC<Props> = ({ balance, setBalance }) => {
       </button>
       {
         isDrawing ?
-        <button onClick={onFinishDrawing} className="underline ml-10 h-10">Finish</button>
+        <>
+        {
+          validDraw ?
+          <button onClick={onFinishDrawing} className="underline ml-10 h-10">Finish</button>
+          :
+          <button onClick={onFinishDrawing} className="underline ml-10 h-10">Cancel</button>
+        }
+        </>
         :
         <button onClick={() => setIsDrawing(true)} className="underline ml-10 h-10">Draw</button>
       }

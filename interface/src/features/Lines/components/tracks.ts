@@ -67,6 +67,20 @@ export const generateTrack = (points: number[][], grid: any[][]): any[][] => {
       gridcell.track.type = 5
       gridcell.track.rotation = -90
     }
+
+    else if ((dir0 == 4 && dir2 == 6) || (dir0 == 6 && dir2 == 4)) {
+      gridcell.track.type = 6
+      gridcell.track.rotation = 0
+    } else if ((dir0 == 0 && dir2 == 6) || (dir0 == 6 && dir2 == 0)) {
+      gridcell.track.type = 6
+      gridcell.track.rotation = 90
+    } else if ((dir0 == 0 && dir2 == 2) || (dir0 == 2 && dir2 == 0)) {
+      gridcell.track.type = 6
+      gridcell.track.rotation = 180
+    } else if ((dir0 == 2 && dir2 == 4) || (dir0 == 4 && dir2 == 2)) {
+      gridcell.track.type = 6
+      gridcell.track.rotation = -90
+    }
   }
   return map
 }

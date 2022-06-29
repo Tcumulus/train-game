@@ -5,6 +5,7 @@ import two from "src/assets/lines/two.png"
 import three from "src/assets/lines/three.png"
 import four from "src/assets/lines/four.png"
 import five from "src/assets/lines/five.png"
+import six from "src/assets/lines/six.png"
 
 interface Props {
   track: any
@@ -73,6 +74,20 @@ const Track: React.FC<Props> = ({ track }) => {
         <img src={five} className="rotate-180"/> 
         :
         <img src={five} className="-rotate-90"/> 
+      }
+      </>
+
+      : track.type === 6 ?
+      <>
+      {
+        track.rotation === 0 ?
+        <img src={six} className="rotate-0"/> 
+        : track.rotation === 90 ?
+        <img src={six} className="rotate-90"/> 
+        : track.rotation === 180 ?
+        <img src={six} className="rotate-180"/> 
+        :
+        <img src={six} className="-rotate-90"/> 
       }
       </>
       : null
