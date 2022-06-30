@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react"
 import heightmap from "./heightmap"
 import generateCity from "src/features/Cities/components/generateCity"
-import { addLine, endLine, getLine, deleteLine } from "src/features/Lines/lines"
+import { addLine, endLine, getLine, deleteLine, cancelLine } from "src/features/Lines/lines"
 import { generateTrack } from "src/features/Lines/components/tracks"
 import Pixel from "./Pixel"
 
@@ -51,6 +51,13 @@ const Map: React.FC<Props> = ({ balance, setBalance }) => {
     }
   }
 
+  const onCancelDrawing = () => {
+    cancelLine()
+    grid.map(column => column.map(item => item.drawLine = false))
+    setIsDrawing(false)
+    setValidDraw(false)
+  }
+
   const onFinishDrawing = () => {
     if (isDrawing) {
       const line = endLine()
@@ -62,10 +69,8 @@ const Map: React.FC<Props> = ({ balance, setBalance }) => {
         map = generateTrack(line.points, map)
         setGrid(map)
       }
-      grid.map(column => column.map(item => item.drawLine = false))
+      onCancelDrawing()
     }
-    setIsDrawing(false)
-    setValidDraw(false)
   }
 
   const clickLine = (id: number) => {
@@ -98,9 +103,12 @@ const Map: React.FC<Props> = ({ balance, setBalance }) => {
         <>
         {
           validDraw ?
-          <button onClick={onFinishDrawing} className="underline ml-10 h-10">Finish</button>
+          <>
+            <button onClick={onFinishDrawing} className="underline ml-10 h-10">Finish</button>
+            <button onClick={onCancelDrawing} className="underline ml-10 h-10">Cancel</button>
+          </>
           :
-          <button onClick={onFinishDrawing} className="underline ml-10 h-10">Cancel</button>
+          <button onClick={onCancelDrawing} className="underline ml-10 h-10">Cancel</button>
         }
         </>
         :
@@ -108,9 +116,6 @@ const Map: React.FC<Props> = ({ balance, setBalance }) => {
       }
       <p className="ml-10 mt-2">
         {"€" + balance}
-      </p>
-      <p onClick={() => removeLine(0)}>
-        Delete
       </p>
     </div>
   )

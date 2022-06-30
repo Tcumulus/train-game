@@ -21,14 +21,17 @@ let [x0, y0] = [0, 0]
 let lastType = 0
 
 export const getLine = (id: number): Line | undefined => {
-  const line = lines.find(line => line.id === id)
-  return line
+  return lines.find(line => line.id === id)
 }
 
 export const deleteLine = (id: number): Line | undefined => {
   const line = getLine(id)
   lines = lines.filter(line => line.id !== id)
   return line
+}
+
+export const cancelLine = () => {
+  counter = 0
 }
 
 export const addLine = (x: number, y: number, type: number): number[][] | false => {
