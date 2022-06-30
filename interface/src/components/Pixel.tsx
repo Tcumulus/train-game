@@ -2,15 +2,15 @@ import React from "react"
 import City from "src/features/Cities/components/City"
 import Track from "src/features/Lines/components/Track"
 
-
 interface Props {
   x: number,
   y: number,
   gridcell: any,
-  isDrawing: boolean
+  isDrawing: boolean,
+  clickLine: Function
 }
 
-const Pixel: React.FC<Props> = ({ x, y, gridcell, isDrawing }) => {
+const Pixel: React.FC<Props> = ({ x, y, gridcell, isDrawing, clickLine }) => {
   const getColor = (): string => {
     let color = ""
     if (gridcell.type === 0) {
@@ -36,7 +36,9 @@ const Pixel: React.FC<Props> = ({ x, y, gridcell, isDrawing }) => {
               <div className={`w-3 h-3 ${getColor()}`}>
                 {
                   gridcell.line ?
-                  <Track track={gridcell.track}/>
+                  <div onClick={() => clickLine(gridcell.lineId)}>
+                    <Track track={gridcell.track}/>
+                  </div>
                   : null
                 }
               </div>

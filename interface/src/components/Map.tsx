@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react"
 import heightmap from "./heightmap"
 import generateCity from "src/features/Cities/components/generateCity"
-import { addLine, endLine } from "src/features/Lines/lines"
+import { addLine, endLine, getLine, deleteLine } from "src/features/Lines/lines"
 import { generateTrack } from "src/features/Lines/components/tracks"
 import Pixel from "./Pixel"
 
@@ -15,6 +15,7 @@ interface Props {
 interface Gridcell {
   type: number,
   line: boolean,
+  lineId: number,
   drawLine: boolean,
   track: { type: number, rotation: number }
 }
@@ -40,7 +41,7 @@ const Map: React.FC<Props> = ({ balance, setBalance }) => {
     if (isDrawing) {
       const points = addLine(x, y, grid[x][y].type)
       if (points) {
-        const map = updatePoints(points, grid, true)
+        const map = addTemporaryPoints(points, grid)
         setGrid(map)
         if (points.length > 1) {
           if (grid[x][y].type === 3) { setValidDraw(true) }
@@ -52,13 +53,13 @@ const Map: React.FC<Props> = ({ balance, setBalance }) => {
 
   const onFinishDrawing = () => {
     if (isDrawing) {
-      const points = endLine()
-      if (points) {
-        const price = calculateLinePrice(grid, points)
+      const line = endLine()
+      if (line) {
+        const price = calculateLinePrice(grid, line.points)
         setBalance((balance: number) => balance - price)
 
-        let map = updatePoints(points, grid, false)
-        map = generateTrack(points, map)
+        let map = addPoints(line, grid)
+        map = generateTrack(line.points, map)
         setGrid(map)
       }
       grid.map(column => column.map(item => item.drawLine = false))
@@ -67,13 +68,24 @@ const Map: React.FC<Props> = ({ balance, setBalance }) => {
     setValidDraw(false)
   }
 
+  const clickLine = (id: number) => {
+    const line = getLine(id)
+    console.log(line)
+  }
+
+  const removeLine = (id: number) => {
+    const line = deleteLine(id)
+    const map = removePoints(line, grid)
+    setGrid(map)
+  }
+
   return(
     <div className="flex">
       <div className="grid grid-rows-64 grid-flow-col overflow-auto">
         { grid.map((rows, i) =>
           rows.map((col, k) => (
             <div onClick={() => onStartDrawing(i, k)} key={`${i}-${k}`}>
-              <Pixel x={i} y={k} gridcell={grid[i][k]} isDrawing={isDrawing}/>
+              <Pixel x={i} y={k} gridcell={grid[i][k]} isDrawing={isDrawing} clickLine={clickLine}/>
             </div>
           ))
         )}
@@ -97,6 +109,9 @@ const Map: React.FC<Props> = ({ balance, setBalance }) => {
       <p className="ml-10 mt-2">
         {"€" + balance}
       </p>
+      <p onClick={() => removeLine(0)}>
+        Delete
+      </p>
     </div>
   )
 }
@@ -104,8 +119,9 @@ export default Map
 
 const initiateGridcell = (): Gridcell => {
   const gridcell = { 
-    type: 0, 
-    line: false, 
+    type: 0,
+    line: false,
+    lineId: 0,
     drawLine: false, 
     track: { type: 0, rotation: 0 } 
   }
@@ -150,17 +166,40 @@ const calculateLinePrice = (grid: Gridcell[][], points: number[][]): number => {
   return price
 }
 
-const updatePoints = (points: number[][], grid: Gridcell[][], temp: boolean): Gridcell[][] => {
+const addPoints = (line: any, grid: Gridcell[][]): Gridcell[][] => {
+  const map = [...grid]
+  for(let i = 0; i < line.points.length; i++) {
+    const x = line.points[i][0]
+    const y = line.points[i][1]
+    if (map[x][y].type !== 3) {
+      map[x][y].line = true
+      map[x][y].lineId = line.id
+    }
+  }
+  return map
+}
+
+const removePoints = (line: any, grid: Gridcell[][]): Gridcell[][] => {
+  const map = [...grid]
+  for(let i = 0; i < line.points.length; i++) {
+    const x = line.points[i][0]
+    const y = line.points[i][1]
+    if (map[x][y].type !== 3) {
+      map[x][y].line = false
+      map[x][y].lineId = 0
+      map[x][y].track = { type: 0, rotation: 0 } 
+    }
+  }
+  return map
+}
+
+const addTemporaryPoints = (points: number[][], grid: Gridcell[][]): Gridcell[][] => {
   const map = [...grid]
   for(let i = 0; i < points.length; i++) {
     const x = points[i][0]
     const y = points[i][1]
     if (map[x][y].type !== 3) {
-      if (temp) {
-        map[x][y].drawLine = true
-      } else {
-        map[x][y].line = true
-      }
+      map[x][y].drawLine = true
     }
   }
   return map
