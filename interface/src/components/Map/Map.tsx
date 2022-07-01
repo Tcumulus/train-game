@@ -4,6 +4,7 @@ import generateCity from "src/features/Cities/components/generateCity"
 import { addLine, endLine, getLine, deleteLine, cancelLine } from "src/features/Lines/lines"
 import { generateTrack } from "src/features/Lines/components/tracks"
 import Pixel from "./components/Pixel"
+import Static from "../Static/Static"
 
 const dimensions = 64
 interface Props {
@@ -79,7 +80,7 @@ const Map: React.FC<Props> = ({ balance, setBalance }) => {
   }
 
   return(
-    <div className="flex">
+    <div className="overflow-hidden">
       <div className="grid grid-rows-64 grid-flow-col overflow-auto">
         { grid.map((rows, i) =>
           rows.map((col, k) => (
@@ -89,28 +90,8 @@ const Map: React.FC<Props> = ({ balance, setBalance }) => {
           ))
         )}
       </div>
-      <button onClick={onClickNewCity} className="underline ml-10 h-10">
-        Add city
-      </button>
-      {
-        isDrawing ?
-        <>
-        {
-          validDraw ?
-          <>
-            <button onClick={onFinishDrawing} className="underline ml-10 h-10">Finish</button>
-            <button onClick={onCancelDrawing} className="underline ml-10 h-10">Cancel</button>
-          </>
-          :
-          <button onClick={onCancelDrawing} className="underline ml-10 h-10">Cancel</button>
-        }
-        </>
-        :
-        <button onClick={() => setIsDrawing(true)} className="underline ml-10 h-10">Draw</button>
-      }
-      <p className="ml-10 mt-2">
-        {"€" + balance}
-      </p>
+      <Static balance={balance} isDrawing={isDrawing} setIsDrawing={setIsDrawing} validDraw={validDraw} 
+        onClickNewCity={onClickNewCity} onFinishDrawing={onFinishDrawing} onCancelDrawing={onCancelDrawing}/>
     </div>
   )
 }
