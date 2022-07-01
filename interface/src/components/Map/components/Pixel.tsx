@@ -7,11 +7,11 @@ interface Props {
   y: number,
   gridcell: any,
   isDrawing: boolean,
-  clickLine: Function
+  clickLine: Function,
 }
 
 const Pixel: React.FC<Props> = ({ x, y, gridcell, isDrawing, clickLine }) => {
-  const getColor = (): string => {
+  const getClassname = (): string => {
     let color = ""
     if (gridcell.type === 0) {
       color = "bg-blue-700 hover:bg-blue-800"
@@ -26,14 +26,14 @@ const Pixel: React.FC<Props> = ({ x, y, gridcell, isDrawing, clickLine }) => {
     <>
       {
         gridcell.drawLine ?
-        <div className="w-3 h-3 bg-yellow-700 hover:bg-yellow-800" />
+        <div className={`w-6 h-6 bg-yellow-700 hover:bg-yellow-800`} />
         :
         <>
           {
             gridcell.type === 3 ?
             <City x={x} y={y} isDrawing={isDrawing}/>
             :
-              <div className={`w-3 h-3 ${getColor()}`}>
+              <div className={`w-6 h-6 ${getClassname()}`}>
                 {
                   gridcell.line ?
                   <div onClick={() => clickLine(gridcell.lineId)}>

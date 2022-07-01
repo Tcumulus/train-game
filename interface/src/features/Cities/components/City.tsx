@@ -19,7 +19,7 @@ const City: React.FC<Props> = ({ x, y, isDrawing }) => {
   }
 
   return(
-    <div onClick={onCityClick} className="w-3 h-3 bg-red-700 hover:bg-red-800"></div>
+    <div onClick={onCityClick} className="w-6 h-6 bg-red-700 hover:bg-red-800"></div>
   )
 }
 
