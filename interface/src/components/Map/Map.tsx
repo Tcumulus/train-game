@@ -12,10 +12,17 @@ interface Props {
   setBalance: Function
 }
 
+interface Popup {
+  active: boolean,
+  type: string,
+  info: object
+}
+
 const Map: React.FC<Props> = ({ balance, setBalance }) => {
   const [grid, setGrid] = useState<Gridcell[][]>([[]])
   const [isDrawing, setIsDrawing] = useState<boolean>(false)
   const [validDraw, setValidDraw] = useState<boolean>(false)
+  const [popup, setPopup] = useState<Popup>({ active: false, type: "", info: {} })
 
   useEffect(() => {
     const map = generateGrid()
@@ -70,13 +77,16 @@ const Map: React.FC<Props> = ({ balance, setBalance }) => {
 
   const clickLine = (id: number) => {
     const line = getLine(id)
-    console.log(line)
+    if (line) {
+      setPopup({ active: true, type: "line", info: line })
+    }
   }
 
   const removeLine = (id: number) => {
     const line = deleteLine(id)
     const map = removePoints(line, grid)
     setGrid(map)
+    setPopup({ active: false, type: "", info: {} })
   }
 
   return(
@@ -91,7 +101,8 @@ const Map: React.FC<Props> = ({ balance, setBalance }) => {
         )}
       </div>
       <Static balance={balance} isDrawing={isDrawing} setIsDrawing={setIsDrawing} validDraw={validDraw} 
-        onClickNewCity={onClickNewCity} onFinishDrawing={onFinishDrawing} onCancelDrawing={onCancelDrawing}/>
+        onClickNewCity={onClickNewCity} onFinishDrawing={onFinishDrawing} onCancelDrawing={onCancelDrawing}
+        popup={popup} setPopup={setPopup} removeLine={removeLine}/>
     </div>
   )
 }

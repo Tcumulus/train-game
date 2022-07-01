@@ -2,6 +2,7 @@ import { addSegment } from "./components/segments.ts"
 
 interface Line {
   id: number,
+  name: string,
   x0: number,
   y0: number,
   x1: number,
@@ -67,6 +68,7 @@ export const endLine = (): Line | false => {
     const id = lines.length > 0 ? lines[lines.length-1].id + 1 : 0
     const line = {
       id: id,
+      name: "line " + id,
       x0: segments[0].x0,
       y0: segments[0].y0,
       x1: x0,
@@ -79,4 +81,9 @@ export const endLine = (): Line | false => {
     return line
   }
   return false
+}
+
+export const changeName = (id: number, name: string) => {
+  const index = lines.findIndex((line => line.id == id))
+  lines[index].name = name
 }
