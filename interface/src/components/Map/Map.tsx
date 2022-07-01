@@ -1,23 +1,14 @@
 import React, { useState, useEffect } from "react"
-import heightmap from "./heightmap"
+import { Gridcell, generateGrid, calculateLinePrice, addPoints, removePoints, addTemporaryPoints } from "./components/gridOperations"
 import generateCity from "src/features/Cities/components/generateCity"
 import { addLine, endLine, getLine, deleteLine, cancelLine } from "src/features/Lines/lines"
 import { generateTrack } from "src/features/Lines/components/tracks"
-import Pixel from "./Pixel"
+import Pixel from "./components/Pixel"
 
 const dimensions = 64
-
 interface Props {
   balance: number,
   setBalance: Function
-}
-
-interface Gridcell {
-  type: number,
-  line: boolean,
-  lineId: number,
-  drawLine: boolean,
-  track: { type: number, rotation: number }
 }
 
 const Map: React.FC<Props> = ({ balance, setBalance }) => {
@@ -58,19 +49,22 @@ const Map: React.FC<Props> = ({ balance, setBalance }) => {
     setValidDraw(false)
   }
 
-  const onFinishDrawing = () => {
+  const onFinishDrawing = (): boolean => {
     if (isDrawing) {
+      onCancelDrawing()
       const line = endLine()
       if (line) {
         const price = calculateLinePrice(grid, line.points)
-        setBalance((balance: number) => balance - price)
-
-        let map = addPoints(line, grid)
-        map = generateTrack(line.points, map)
-        setGrid(map)
+        if (price <= balance) {
+          setBalance((balance: number) => balance - price)
+          let map = addPoints(line, grid)
+          map = generateTrack(line.points, map)
+          setGrid(map)
+          return true
+        }
       }
-      onCancelDrawing()
     }
+    return false
   }
 
   const clickLine = (id: number) => {
@@ -121,91 +115,3 @@ const Map: React.FC<Props> = ({ balance, setBalance }) => {
   )
 }
 export default Map
-
-const initiateGridcell = (): Gridcell => {
-  const gridcell = { 
-    type: 0,
-    line: false,
-    lineId: 0,
-    drawLine: false, 
-    track: { type: 0, rotation: 0 } 
-  }
-  return gridcell
-}
-
-const generateGrid = (): Gridcell[][] => {
-  const map = heightmap(dimensions, 1, 3.5)
-  const rows = []
-  for(let i = 0; i < dimensions; i++) {
-    const column = []
-    for(let j = 0; j < dimensions; j++) {
-      let element = initiateGridcell()
-      const cell = map[i][j]
-      if (cell < 0.2) {
-        element.type = 0
-        column.push(element)
-      }
-      else if (cell >= 0.2 && cell < 0.85) {
-        element.type = 1
-        column.push(element) 
-      }
-      else {
-        element.type = 2
-        column.push(element) 
-      }
-    }
-    rows.push(column)
-  }
-  return rows
-}
-
-const calculateLinePrice = (grid: Gridcell[][], points: number[][]): number => {
-  let price = 0
-  for(let i = 0; i < points.length; i++) {
-    const type = grid[points[i][0]][points[i][1]].type
-    if (type === 0) { price += 10 }
-    else if (type === 1) { price += 2 }
-    else if (type === 2) { price += 6 }
-    else if (type === 3) { price += 15 }
-  }
-  return price
-}
-
-const addPoints = (line: any, grid: Gridcell[][]): Gridcell[][] => {
-  const map = [...grid]
-  for(let i = 0; i < line.points.length; i++) {
-    const x = line.points[i][0]
-    const y = line.points[i][1]
-    if (map[x][y].type !== 3) {
-      map[x][y].line = true
-      map[x][y].lineId = line.id
-    }
-  }
-  return map
-}
-
-const removePoints = (line: any, grid: Gridcell[][]): Gridcell[][] => {
-  const map = [...grid]
-  for(let i = 0; i < line.points.length; i++) {
-    const x = line.points[i][0]
-    const y = line.points[i][1]
-    if (map[x][y].type !== 3) {
-      map[x][y].line = false
-      map[x][y].lineId = 0
-      map[x][y].track = { type: 0, rotation: 0 } 
-    }
-  }
-  return map
-}
-
-const addTemporaryPoints = (points: number[][], grid: Gridcell[][]): Gridcell[][] => {
-  const map = [...grid]
-  for(let i = 0; i < points.length; i++) {
-    const x = points[i][0]
-    const y = points[i][1]
-    if (map[x][y].type !== 3) {
-      map[x][y].drawLine = true
-    }
-  }
-  return map
-}
