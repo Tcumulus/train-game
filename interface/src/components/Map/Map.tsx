@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react"
 import { Gridcell, generateGrid, calculateLinePrice, addPoints, removePoints, addTemporaryPoints } from "./components/gridOperations"
-import generateCity from "src/features/Cities/components/generateCity"
+import { addCity, getCity } from "src/features/Cities/cities"
 import { addLine, endLine, getLine, deleteLine, cancelLine } from "src/features/Lines/lines"
 import { generateTrack } from "src/features/Lines/components/tracks"
 import Pixel from "./components/Pixel"
@@ -31,19 +31,19 @@ const Map: React.FC<Props> = ({ balance, setBalance }) => {
 
   const onClickNewCity = () => {
     const map = [...grid]
-    const [x, y] = generateCity(map, dimensions)
-    map[x][y].type = 3
+    const city = addCity(grid, dimensions)
+    map[city.x][city.y].city = city.id
     setGrid(map)
   }
 
   const onStartDrawing = (x: number, y: number) => {
     if (isDrawing) {
-      const points = addLine(x, y, grid[x][y].type)
+      const points = addLine(x, y)
       if (points) {
         const map = addTemporaryPoints(points, grid)
         setGrid(map)
         if (points.length > 1) {
-          if (grid[x][y].type === 3) { setValidDraw(true) }
+          if (grid[x][y].city) { setValidDraw(true) }
           else { setValidDraw(false) }
         }
       }
@@ -89,13 +89,21 @@ const Map: React.FC<Props> = ({ balance, setBalance }) => {
     setPopup({ active: false, type: "", info: {} })
   }
 
+  const clickCity = (id: number) => {
+    const city = getCity(id)
+    if (city) {
+      setPopup({ active: true, type: "city", info: city })
+    }
+  }
+
   return(
     <div className="overflow-hidden">
       <div className="grid grid-rows-64 grid-flow-col overflow-auto">
         { grid.map((rows, i) =>
           rows.map((col, k) => (
             <div onClick={() => onStartDrawing(i, k)} key={`${i}-${k}`}>
-              <Pixel x={i} y={k} gridcell={grid[i][k]} isDrawing={isDrawing} clickLine={clickLine}/>
+              <Pixel x={i} y={k} gridcell={grid[i][k]} clickLine={clickLine} clickCity={clickCity} isDrawing={isDrawing}
+                onStartDrawing={onStartDrawing}/>
             </div>
           ))
         )}

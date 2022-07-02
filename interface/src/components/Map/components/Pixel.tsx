@@ -1,16 +1,17 @@
 import React from "react"
-import City from "src/features/Cities/components/City"
 import Track from "src/features/Lines/components/Track"
 
 interface Props {
   x: number,
   y: number,
   gridcell: any,
-  isDrawing: boolean,
   clickLine: Function,
+  clickCity: Function,
+  isDrawing: boolean,
+  onStartDrawing: Function,
 }
 
-const Pixel: React.FC<Props> = ({ x, y, gridcell, isDrawing, clickLine }) => {
+const Pixel: React.FC<Props> = ({ x, y, gridcell, clickLine, clickCity, isDrawing, onStartDrawing }) => {
   const getClassname = (): string => {
     let color = ""
     if (gridcell.type === 0) {
@@ -28,22 +29,25 @@ const Pixel: React.FC<Props> = ({ x, y, gridcell, isDrawing, clickLine }) => {
         gridcell.drawLine ?
         <div className={`w-6 h-6 bg-yellow-700 hover:bg-yellow-800`} />
         :
-        <>
+        <div className={`w-6 h-6 ${getClassname()}`}>
           {
-            gridcell.type === 3 ?
-            <City x={x} y={y} isDrawing={isDrawing}/>
-            :
-              <div className={`w-6 h-6 ${getClassname()}`}>
-                {
-                  gridcell.line ?
-                  <div onClick={() => clickLine(gridcell.lineId)}>
-                    <Track track={gridcell.track}/>
-                  </div>
-                  : null
-                }
-              </div>
+            gridcell.line ?
+            <div onClick={() => clickLine(gridcell.line)}>
+              <Track track={gridcell.track}/>
+            </div>
+            : 
+            gridcell.city ?
+            <>
+              {
+                isDrawing ?
+                <div onClick={() => onStartDrawing(x, y)} className="w-6 h-6 bg-red-700 hover:bg-red-800"/>
+                :
+                <div onClick={() => clickCity(gridcell.city)} className="w-6 h-6 bg-red-700 hover:bg-red-800"/>
+              }
+            </>
+            : null
           }
-        </>
+        </div>
       }
     </>
   )

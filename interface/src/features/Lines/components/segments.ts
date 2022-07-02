@@ -8,6 +8,7 @@ interface Segment {
 }
 
 export const addSegment = (x0: number, y0: number, x1: number, y1: number): Segment => {
+  const [_x0, _y0] = [x0, y0]
   const points: number[][] = []
   const [dx, dy] = [Math.abs(x1 - x0), -Math.abs(y1 - y0)]
   const [sx, sy] = [x0 < x1 ? 1 : -1, y0 < y1 ? 1 : -1]
@@ -31,8 +32,8 @@ export const addSegment = (x0: number, y0: number, x1: number, y1: number): Segm
   
   const distance = Math.sqrt(dx**2 + dy**2)
   const segment = {
-    x0: x0,
-    y0: y0,
+    x0: _x0,
+    y0: _y0,
     x1: x1,
     y1: y1,
     points: points,

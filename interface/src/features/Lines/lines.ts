@@ -1,12 +1,11 @@
 import { addSegment } from "./components/segments.ts"
+import { isCity, getCityIdByCoords } from "src/features/Cities/cities"
 
 interface Line {
   id: number,
   name: string,
-  x0: number,
-  y0: number,
-  x1: number,
-  y1: number,
+  c0: number,
+  c1: number,
   segments: any[],
   points: number[][],
   distance: number
@@ -19,7 +18,6 @@ let points: number[][] = []
 let segments: any[] = []
 let distance = 0
 let [x0, y0] = [0, 0]
-let lastType = 0
 
 export const getLine = (id: number): Line | undefined => {
   return lines.find(line => line.id === id)
@@ -35,14 +33,13 @@ export const cancelLine = () => {
   counter = 0
 }
 
-export const addLine = (x: number, y: number, type: number): number[][] | false => {
+export const addLine = (x: number, y: number): number[][] | false => {
   if (counter === 0) {
+    const city = isCity(x, y)
+    if (!city) { return false }
     points = []
     segments = []
     distance = 0
-    if (type !== 3) {
-      return false
-    }
   } else {
     if (x0 !== x || y0 !== y) {
       const segment = addSegment(x0, y0, x, y)
@@ -56,7 +53,6 @@ export const addLine = (x: number, y: number, type: number): number[][] | false 
     }
   }
   [x0, y0] = [x, y]
-  lastType = type
   counter++
 
   return points
@@ -64,26 +60,29 @@ export const addLine = (x: number, y: number, type: number): number[][] | false 
 
 export const endLine = (): Line | false => {
   counter = 0
-  if (segments.length > 0 && lastType === 3) {
-    const id = lines.length > 0 ? lines[lines.length-1].id + 1 : 0
-    const line = {
-      id: id,
-      name: "line " + id,
-      x0: segments[0].x0,
-      y0: segments[0].y0,
-      x1: x0,
-      y1: y0,
-      segments: segments,
-      points: points,
-      distance: distance
+  const city = isCity(x0, y0)
+  if (segments.length > 0 && city) {
+    const id = lines.length > 0 ? lines[lines.length-1].id + 1 : 1
+    const c0 = getCityIdByCoords(segments[0].x0, segments[0].y0)
+    const c1 = getCityIdByCoords(x0, y0)
+    if (c0 && c1) {
+      const line = {
+        id: id,
+        name: "line " + id,
+        c0: c0,
+        c1: c1,
+        segments: segments,
+        points: points,
+        distance: distance
+      }
+      lines.push(line)
+      return line
     }
-    lines.push(line)
-    return line
   }
   return false
 }
 
-export const changeName = (id: number, name: string) => {
+export const changeLineName = (id: number, name: string) => {
   const index = lines.findIndex((line => line.id == id))
   lines[index].name = name
 }

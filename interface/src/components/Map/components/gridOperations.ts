@@ -3,8 +3,8 @@ const dimensions = 64
 
 export interface Gridcell {
   type: number,
-  line: boolean,
-  lineId: number,
+  line: boolean | number,
+  city: boolean | number,
   drawLine: boolean,
   track: { type: number, rotation: number }
 }
@@ -12,8 +12,8 @@ export interface Gridcell {
 const initiateGridcell = (): Gridcell => {
   const gridcell = { 
     type: 0,
+    city: false,
     line: false,
-    lineId: 0,
     drawLine: false, 
     track: { type: 0, rotation: 0 } 
   }
@@ -63,9 +63,8 @@ export const addPoints = (line: any, grid: Gridcell[][]): Gridcell[][] => {
   for(let i = 0; i < line.points.length; i++) {
     const x = line.points[i][0]
     const y = line.points[i][1]
-    if (map[x][y].type !== 3) {
-      map[x][y].line = true
-      map[x][y].lineId = line.id
+    if (!map[x][y].city) {
+      map[x][y].line = line.id
     }
   }
   return map
@@ -78,7 +77,6 @@ export const removePoints = (line: any, grid: Gridcell[][]): Gridcell[][] => {
     const y = line.points[i][1]
     if (map[x][y].type !== 3) {
       map[x][y].line = false
-      map[x][y].lineId = 0
       map[x][y].track = { type: 0, rotation: 0 } 
     }
   }
@@ -90,7 +88,7 @@ export const addTemporaryPoints = (points: number[][], grid: Gridcell[][]): Grid
   for(let i = 0; i < points.length; i++) {
     const x = points[i][0]
     const y = points[i][1]
-    if (map[x][y].type !== 3) {
+    if (!map[x][y].city) {
       map[x][y].drawLine = true
     }
   }

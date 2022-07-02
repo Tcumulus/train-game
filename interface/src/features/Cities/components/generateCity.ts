@@ -17,22 +17,19 @@ const generateCity = (grid: any[][], dimensions: number): [number, number] => {
     }
   }
 
-  if (grid[x][y].type === 1) {
+  if (grid[x][y].type === 1 && !grid[x][y].city) {
     //check that there is no city in the 5x5 grid surrounding it
     for(let i = 0; i < 5; i++) {
       for(let j = 0; j < 5; j++) {
         if (isCity(x+i-2, y+j-2)) {
           [x, y] = generateCity(grid, dimensions)
-          addCity(x, y)
           return [x, y]
         }
       }
     }
-    addCity(x, y)
     return [x, y]
   } else {
     [x, y] = generateCity(grid, dimensions)
-    addCity(x, y)
     return [x, y]
   }
 }
