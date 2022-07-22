@@ -3,6 +3,7 @@ import { Gridcell, generateGrid, calculateLinePrice, addPoints, removePoints, ad
 import { addCity, getCity } from "src/features/Cities/cities"
 import { addLine, endLine, getLine, deleteLine, cancelLine } from "src/features/Lines/lines"
 import { generateTrack } from "src/features/Lines/components/tracks"
+import { addRoute } from "src/features/Routes/routes"
 import Pixel from "./components/Pixel"
 import Static from "../Static/Static"
 
@@ -14,15 +15,27 @@ interface Props {
 
 interface Popup {
   active: boolean,
-  type: string,
-  info: object
+  type?: string,
+  info?: object
+}
+
+interface DrawingLine {
+  active: boolean,
+  valid: boolean,
+  price?: number,
+  distance?: number
+}
+
+interface AddingRoute {
+  active: boolean,
+  lines?: any[]
 }
 
 const Map: React.FC<Props> = ({ balance, setBalance }) => {
   const [grid, setGrid] = useState<Gridcell[][]>([[]])
-  const [isDrawing, setIsDrawing] = useState<boolean>(false)
-  const [validDraw, setValidDraw] = useState<boolean>(false)
-  const [popup, setPopup] = useState<Popup>({ active: false, type: "", info: {} })
+  const [drawingLine, setDrawingLine] = useState<DrawingLine>({ active: false, valid: false })
+  const [addingRoute, setAddingRoute] = useState<AddingRoute>({ active: false })
+  const [popup, setPopup] = useState<Popup>({ active: false })
 
   useEffect(() => {
     const map = generateGrid()
@@ -37,14 +50,16 @@ const Map: React.FC<Props> = ({ balance, setBalance }) => {
   }
 
   const onStartDrawing = (x: number, y: number) => {
-    if (isDrawing) {
-      const points = addLine(x, y)
-      if (points) {
+    if (drawingLine.active) {
+      const line = addLine(x, y)
+      if (line) {
+        const [points, distance] = [line[0], line[1]]
+        const price = calculateLinePrice(grid, points)
         const map = addTemporaryPoints(points, grid)
         setGrid(map)
         if (points.length > 1) {
-          if (grid[x][y].city) { setValidDraw(true) }
-          else { setValidDraw(false) }
+          if (grid[x][y].city) { setDrawingLine({ active: true, valid: true, price: price, distance: distance }) }
+          else { setDrawingLine({ active: true, valid: false, price: price, distance: distance }) }
         }
       }
     }
@@ -53,12 +68,11 @@ const Map: React.FC<Props> = ({ balance, setBalance }) => {
   const onCancelDrawing = () => {
     cancelLine()
     grid.map(column => column.map(item => item.drawLine = false))
-    setIsDrawing(false)
-    setValidDraw(false)
+    setDrawingLine({ active: false, valid: false })
   }
 
   const onFinishDrawing = (): boolean => {
-    if (isDrawing) {
+    if (drawingLine.active) {
       onCancelDrawing()
       const line = endLine()
       if (line) {
@@ -76,13 +90,20 @@ const Map: React.FC<Props> = ({ balance, setBalance }) => {
   }
 
   const clickLine = (id: number) => {
-    const line = getLine(id)
-    if (line) {
-      setPopup({ active: true, type: "line", info: line })
+    if(addingRoute.active) {
+      const lines = addRoute(id)
+      if (lines) {
+        setAddingRoute({ active: true, lines: lines })
+      }
+    } else {
+      const line = getLine(id)
+      if (line) {
+        setPopup({ active: true, type: "line", info: line })
+      }
     }
   }
 
-  const removeLine = (id: number) => {
+  const onRemoveLine = (id: number) => {
     const line = deleteLine(id)
     const map = removePoints(line, grid)
     setGrid(map)
@@ -97,20 +118,20 @@ const Map: React.FC<Props> = ({ balance, setBalance }) => {
   }
 
   return(
-    <div className="overflow-hidden">
+    <div>
       <div className="grid grid-rows-64 grid-flow-col overflow-auto">
         { grid.map((rows, i) =>
           rows.map((col, k) => (
             <div onClick={() => onStartDrawing(i, k)} key={`${i}-${k}`}>
-              <Pixel x={i} y={k} gridcell={grid[i][k]} clickLine={clickLine} clickCity={clickCity} isDrawing={isDrawing}
+              <Pixel x={i} y={k} gridcell={grid[i][k]} clickLine={clickLine} clickCity={clickCity} drawingLine={drawingLine}
                 onStartDrawing={onStartDrawing}/>
             </div>
           ))
         )}
       </div>
-      <Static balance={balance} isDrawing={isDrawing} setIsDrawing={setIsDrawing} validDraw={validDraw} 
-        onClickNewCity={onClickNewCity} onFinishDrawing={onFinishDrawing} onCancelDrawing={onCancelDrawing}
-        popup={popup} setPopup={setPopup} removeLine={removeLine}/>
+      <Static balance={balance} drawingLine={drawingLine} setDrawingLine={setDrawingLine} setAddingRoute={setAddingRoute}
+        addingRoute={addingRoute} onClickNewCity={onClickNewCity} onFinishDrawing={onFinishDrawing} 
+        onCancelDrawing={onCancelDrawing} popup={popup} setPopup={setPopup} onRemoveLine={onRemoveLine}/>
     </div>
   )
 }

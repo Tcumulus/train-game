@@ -1,11 +1,11 @@
 import { addSegment } from "./components/segments.ts"
-import { isCity, getCityIdByCoords } from "src/features/Cities/cities"
+import { isCity, getCityByCoords } from "src/features/Cities/cities"
 
 interface Line {
   id: number,
   name: string,
-  c0: number,
-  c1: number,
+  city0: any,
+  city1: any,
   segments: any[],
   points: number[][],
   distance: number
@@ -33,7 +33,7 @@ export const cancelLine = () => {
   counter = 0
 }
 
-export const addLine = (x: number, y: number): number[][] | false => {
+export const addLine = (x: number, y: number): [number[][], number] | false => {
   if (counter === 0) {
     const city = isCity(x, y)
     if (!city) { return false }
@@ -55,7 +55,7 @@ export const addLine = (x: number, y: number): number[][] | false => {
   [x0, y0] = [x, y]
   counter++
 
-  return points
+  return [points, distance]
 }
 
 export const endLine = (): Line | false => {
@@ -63,14 +63,14 @@ export const endLine = (): Line | false => {
   const city = isCity(x0, y0)
   if (segments.length > 0 && city) {
     const id = lines.length > 0 ? lines[lines.length-1].id + 1 : 1
-    const c0 = getCityIdByCoords(segments[0].x0, segments[0].y0)
-    const c1 = getCityIdByCoords(x0, y0)
-    if (c0 && c1) {
-      const line = {
+    const city0 = getCityByCoords(segments[0].x0, segments[0].y0)
+    const city1 = getCityByCoords(x0, y0)
+    if (city0 && city1) {
+      const line: Line = {
         id: id,
         name: "line " + id,
-        c0: c0,
-        c1: c1,
+        city0: city0,
+        city1: city1,
         segments: segments,
         points: points,
         distance: distance

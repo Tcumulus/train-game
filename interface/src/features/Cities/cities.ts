@@ -16,9 +16,9 @@ export const getCity = (id: number): City | undefined => {
   return city
 }
 
-export const getCityIdByCoords = (x: number, y: number): number | false => {
+export const getCityByCoords = (x: number, y: number): City | undefined => {
   const city = cities.find(city => city.x === x && city.y === y)
-  return city ? city.id : false
+  return city
 }
 
 export const isCity = (x: number, y: number): boolean => {

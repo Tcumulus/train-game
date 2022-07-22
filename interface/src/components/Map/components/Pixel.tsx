@@ -7,11 +7,11 @@ interface Props {
   gridcell: any,
   clickLine: Function,
   clickCity: Function,
-  isDrawing: boolean,
+  drawingLine: any,
   onStartDrawing: Function,
 }
 
-const Pixel: React.FC<Props> = ({ x, y, gridcell, clickLine, clickCity, isDrawing, onStartDrawing }) => {
+const Pixel: React.FC<Props> = ({ x, y, gridcell, clickLine, clickCity, drawingLine, onStartDrawing }) => {
   const getClassname = (): string => {
     let color = ""
     if (gridcell.type === 0) {
@@ -39,7 +39,7 @@ const Pixel: React.FC<Props> = ({ x, y, gridcell, clickLine, clickCity, isDrawin
             gridcell.city ?
             <>
               {
-                isDrawing ?
+                drawingLine.active ?
                 <div onClick={() => onStartDrawing(x, y)} className="w-6 h-6 bg-red-700 hover:bg-red-800"/>
                 :
                 <div onClick={() => clickCity(gridcell.city)} className="w-6 h-6 bg-red-700 hover:bg-red-800"/>
